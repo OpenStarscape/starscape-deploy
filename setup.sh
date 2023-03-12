@@ -60,7 +60,7 @@ setup_web() {
   if test ! -e "public/code.js"; then
     printf "${BLUE}building starscape web...$EOL"
     check_deps yarn node
-    if ! yarn || !yarn prod-build; then
+    if ! yarn || ! yarn prod-build; then
       echo
       printf "${RED}yarn failed. updating yarn and node or deleting $STARSCAPE_HOME/web may fix the problem$EOL"
       exit 1
