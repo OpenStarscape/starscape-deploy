@@ -7,10 +7,9 @@ Wants=network-online.target
 Type=simple
 Restart=always
 RestartSec=3
-User=root
 KillSignal=SIGINT
-ExecStart=/root/starscape/server/starscape-server
-WorkingDirectory=/root/starscape/server/
+ExecStart=%h/starscape/server-bin
+WorkingDirectory=%h/starscape
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
