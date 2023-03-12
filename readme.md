@@ -49,6 +49,8 @@ $ certbot --nginx
 # Follow instructions
 ```
 
+__Loopback:__ this repo's starscape.toml has http_loopback enabled. This is required for it to work with nginx, however if you're not using a 3rd party web server and want Starscape to be accessible outside of the current machine this option needs to be disabled.
+
 ## Configuration
 To configure Starscape, edit `~/starscape/starscape.toml` and then run `systemctl --user restart starscape`. Running `~/starscape/server-bin --help` will show you a list of configuration options.
 

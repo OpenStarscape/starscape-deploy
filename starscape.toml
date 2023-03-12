@@ -1,6 +1,7 @@
 max_game_seconds = 7200
 enable_tcp = false
 enable_webrtc_experimental = false
+http_loopback = true
 http_port = 4060
 http_type = "http"
 http_static_content = "./public"
