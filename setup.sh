@@ -2,8 +2,21 @@
 set -euo pipefail
 
 # Runs as an unprivileged user. Does not require sudo. Clones and builds server and web frontend
-# into the ~/starscape directory, and enables a user systemd service that runs starscape. Does not
-# pull updates for repos, or do any building if the project had already been built.
+# into the ~/starscape directory, and enables a user systemd service that runs starscape. Pulls and
+# builds updates if the update argument is given
+
+case ${1:-no_arg} in
+"update")
+  UPDATE=1
+  ;;
+"no_arg")
+  UPDATE=0
+  ;;
+*)
+  printf "${RED}unknown command $1${NORMAL}\n"
+  exit 1
+  ;;
+esac
 
 # -j1 can be removed on CPU's that aren't RAM-constrained
 CARGO_BUILD_ARGS=(-j1)
@@ -34,10 +47,13 @@ setup_server() {
   if test ! -e server; then
     printf "${BLUE}cloning starscape server...$EOL"
     git clone https://github.com/OpenStarscape/starscape-server.git server
+  elif test $UPDATE == 1; then
+    printf "${BLUE}pulling starscape server...$EOL"
+    git -C server pull
   fi
   cd server
   BUILT_BIN_PATH="target/release/starscape-server"
-  if test ! -e "$BUILT_BIN_PATH"; then
+  if test $UPDATE == 1 -o ! -e "$BUILT_BIN_PATH"; then
     printf "${BLUE}building starscape server...$EOL"
     check_deps cargo rustc
     if ! cargo build --release "${CARGO_BUILD_ARGS[@]}"; then
@@ -55,9 +71,12 @@ setup_web() {
   if test ! -e web; then
     printf "${BLUE}cloning starscape web...$EOL"
     git clone https://github.com/OpenStarscape/starscape-web.git web
+  elif test $UPDATE == 1; then
+    printf "${BLUE}pulling starscape web...$EOL"
+    git -C web pull
   fi
   cd web
-  if test ! -e "public/code.js"; then
+  if test $UPDATE == 1 -o ! -e "public/code.js"; then
     printf "${BLUE}building starscape web...$EOL"
     check_deps yarn node
     if ! yarn || ! yarn prod-build; then
@@ -98,10 +117,10 @@ if test ! -e "$STARSCAPE_HOME/starscape.toml"; then
   printf "${BLUE}copying server configuration file...$EOL" "$STARSCAPE_BIN_PATH"
   cp "$SELF_DIR/starscape.toml" "$STARSCAPE_HOME/starscape.toml"
 fi
-if test ! -e "$STARSCAPE_BIN_PATH"; then
+if test $UPDATE == 1 -o ! -e "$STARSCAPE_BIN_PATH"; then
   setup_server
 fi
-if test ! -e "$STARSCAPE_PUBLIC_PATH"; then
+if test $UPDATE == 1 -o ! -e "$STARSCAPE_PUBLIC_PATH"; then
   setup_web
 fi
 setup_service
