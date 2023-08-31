@@ -5,19 +5,6 @@ set -euo pipefail
 # into the ~/starscape directory, and enables a user systemd service that runs starscape. Pulls and
 # builds updates if the update argument is given
 
-case ${1:-no_arg} in
-"update")
-  UPDATE=1
-  ;;
-"no_arg")
-  UPDATE=0
-  ;;
-*)
-  printf "${RED}unknown command $1${NORMAL}\n"
-  exit 1
-  ;;
-esac
-
 # -j1 can be removed on CPU's that aren't RAM-constrained
 CARGO_BUILD_ARGS=(-j1)
 
@@ -33,6 +20,19 @@ EOL="${NORMAL}\n"
 BLUE="\x1b[34m"
 GREEN="\x1b[32m"
 RED="\x1b[31m"
+
+case ${1:-no_arg} in
+"update")
+  UPDATE=1
+  ;;
+"no_arg")
+  UPDATE=0
+  ;;
+*)
+  printf "${RED}unknown command $1${NORMAL}\n"
+  exit 1
+  ;;
+esac
 
 check_deps() {
   for DEP in "$@"; do
