@@ -62,6 +62,10 @@ setup_server() {
       exit 1
     fi
   fi
+  if systemctl --user status starscape &>/dev/null; then
+    printf "${BLUE}stopping service before copying binary...$EOL" "$STARSCAPE_BIN_PATH"
+    systemctl --user stop starscape
+  fi
   printf "${BLUE}copying binary to %s...$EOL" "$STARSCAPE_BIN_PATH"
   cp "$BUILT_BIN_PATH" "$STARSCAPE_BIN_PATH"
   cd "$STARSCAPE_HOME"
